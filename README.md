@@ -1,11 +1,18 @@
-# Human Resources Mobile Application Android
-Mobile apps for employees to access web application human resources and many features giving more easier access anywhere and anytime.
+# Human Resources Mobile Apps
+Cross platform mobile apps for IOS & Android as an extensions for employees to access web application human resources, enterprise resoursce planning, and many features giving more easier access anywhere and anytime.
+Currently used by over 1000+ different users from several companies accross Indonesia.
+
+
+<img src="https://github.com/user-attachments/assets/2b09ea4b-f6b7-4c42-9e8a-9eceedbdfb33" alt="Capture9" width="300" style="border-radius: 20px;">
+
 
 ## Features
+- Activation code
 - User login that integrate with web app
 - Geotagging and take picture for attendance 
 - Perform leave request and approval
 - Check payslip data
+- See employee profile and other personal data
 
 # Technologies
 Build using .NET Maui, latest .NET frameworks features for mobile development. integrated with RESTful API for Database Communication and XAML for front end side create user interface and experiences.
@@ -136,6 +143,69 @@ This document provides an overview of the API endpoints, their methods, and func
 - **GET Requests**: Used for retrieving data from the server. 
 - **POST Requests**: Used for creating new resources, such as adding a new  product.
 
+
+# Security Layer
+There are several security layer applied for this application to prevent from fraud & illegal activity.
+
+* Mock Location
+```csharp
+if (location.IsFromMockProvider){
+  // phone is using mock location
+}
+```
+  
+* Jailbreak / Root Application
+
+  
+* SSL Certificate Pinning for API Consumption
+```csharp
+private bool ValidateCertificate(string url)
+{
+    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(ValidateServerCertificate);
+    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+    request.Method = "GET";
+    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+    {
+        return true;
+    }
+}
+```
+```csharp
+private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+{
+    string expectedPublicKeyHash = " Expected SSL Certificate Public Key in HASH ";
+    if (sslPolicyErrors == SslPolicyErrors.None)
+    {
+        byte[] publicKeyBytes = certificate.GetPublicKey();
+        using (var sha256 = System.Security.Cryptography.SHA256.Create())
+        {
+            byte[] publicKeyHashBytes = sha256.ComputeHash(publicKeyBytes);
+            string publicKeyHash = BitConverter.ToString(publicKeyHashBytes).Replace("-", "").ToLower();
+
+            if (publicKeyHash == expectedPublicKeyHash)
+            {
+                return true;  //  Accept certificate public key if match with expected value
+            }
+        }
+    }
+    return false; // Reject certificate if public key does not match or any error occurs
+}
+```
+* Save Protocol Connection
+```csharp
+android:usesCleartextTraffic="false"
+```
+  
+* Task Hijacking
+```csharp
+android:taskAffinity=""
+```
+  
+* Data Backup 
+```csharp
+android:allowBackup="false"
+android:hasFragileUserData="true"
+```
 
 ###  Target Frameworks
 
